@@ -33,7 +33,7 @@ interfaces = []
 for i in range(0, params.n):
     nodes.append(request.RawPC("node" + str(i)))
     nodes[i].hardware_type = "r7525"
-    nodes[i].disk_image = "urn:publicid:IDN+clemson.cloudlab.us+image+bfkvs-PG0:BF"
+    nodes[i].disk_image = "urn:publicid:IDN+clemson.cloudlab.us+image+bfkvs-PG0:BFNodes.node0"
     node_if = []
     for j in range(0, params.n):
         if j == i:
