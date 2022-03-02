@@ -3,6 +3,7 @@
 Instructions:
 Param n: # of nodes
 Param l: # of links between nodes
+Param i: Disk image
 """
 
 import geni.portal as portal
@@ -14,6 +15,7 @@ request = portal.context.makeRequestRSpec()
 # Describe the parameter(s) this profile script can accept.
 portal.context.defineParameter( "t", "Type of nodes", portal.ParameterType.NODETYPE, "c6525-25g")
 portal.context.defineParameter( "l", "Number of links between nodes", portal.ParameterType.INTEGER, 2)
+portal.context.defineParameter( "i", "Disk image", portal.ParameterType.IMAGE, "urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU20-64-STD")
 
 # Retrieve the values the user specifies during instantiation.
 params = portal.context.bindParameters()
@@ -31,7 +33,7 @@ interfaces = []
 for i in range(0, 2):
     nodes.append(request.RawPC("node" + str(i)))
     nodes[i].hardware_type = params.t
-    nodes[i].disk_image = "urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU20-64-STD"
+    nodes[i].disk_image = params.i
     node_if = []
     for j in range(0, 2):
         if j == i:
