@@ -43,15 +43,10 @@ for i in range(0, params.n):
     interfaces.append(node_if)
 
 # Create link between them
-link_idx = 0
-for i in range(0, params.n):
-    for j in range(i + 1, params.n):
-        for l in range(0, params.l):
-            link = request.Link('link' + str(link_idx))
-            link_idx = link_idx + 1
-            
-            link.addInterface(interfaces[i][l])
-            link.addInterface(interfaces[j][l])
+for l in range(0, params.l):
+    link = request.Link('link' + str(l))
+    for i in range(0, params.n):        
+        link.addInterface(interfaces[i][l])
 
 # Print the RSpec to the enclosing page.
 portal.context.printRequestRSpec()
