@@ -1,7 +1,8 @@
-"""2 Specified Nodes Connected, Ubuntu-20
+"""Any Nodes of same type Connected
 
 Instructions:
 Param t: Type of nodes
+Param n: # of nodes
 Param l: # of links between nodes
 Param i: Disk image
 """
@@ -14,6 +15,7 @@ request = portal.context.makeRequestRSpec()
 
 # Describe the parameter(s) this profile script can accept.
 portal.context.defineParameter( "t", "Type of nodes", portal.ParameterType.NODETYPE, "c6525-25g")
+portal.context.defineParameter( "n", "Number of nodes", portal.ParameterType.INTEGER, 2)
 portal.context.defineParameter( "l", "Number of links between nodes", portal.ParameterType.INTEGER, 2)
 portal.context.defineParameter( "i", "Disk image", portal.ParameterType.IMAGE, "urn:publicid:IDN+utah.cloudlab.us+image+bfkvs-PG0:c6525-25g-rdma")
 
@@ -21,6 +23,8 @@ portal.context.defineParameter( "i", "Disk image", portal.ParameterType.IMAGE, "
 params = portal.context.bindParameters()
 
 # Check parameter validity.
+if params.n < 1 or params.n > 8:
+    portal.context.reportError( portal.ParameterError( "You must choose at least 1 and no more than 8 nodes.", ["n"] ) )
 if params.l < 1 or params.l > 4:
     portal.context.reportError( portal.ParameterError( "You must choose at least 1 and no more than 4 links.", ["l"] ) )
 
@@ -30,31 +34,21 @@ portal.context.verifyParameters()
 nodes = []
 interfaces = []
 # Create n raw "PC" nodes
-for i in range(0, 2):
+for i in range(0, params.n):
     nodes.append(request.RawPC("node" + str(i)))
     nodes[i].hardware_type = params.t
     nodes[i].disk_image = params.i
     node_if = []
-    for j in range(0, 2):
-        if j == i:
-            if_dup = None
-        else:
-            if_dup = []
-            for m in range(0, params.l):
-                if_dup.append(nodes[i].addInterface('node' + str(i) + 'interface' + str(j) + 'dup' + str(m)))
-        node_if.append(if_dup)
+    
+    for l in range(0, params.l):
+        node_if.append(nodes[i].addInterface('node' + str(i) + 'interface' + str(l)))
     interfaces.append(node_if)
 
 # Create link between them
-link_idx = 0
-for i in range(0, 2):
-    for j in range(i + 1, 2):
-        for m in range(0, params.l):
-            link = request.Link('link' + str(link_idx))
-            link_idx = link_idx + 1
-            
-            link.addInterface(interfaces[i][j][m])
-            link.addInterface(interfaces[j][i][m])
+for l in range(0, params.l):
+    link = request.Link('link' + str(l))
+    for i in range(0, params.n):        
+        link.addInterface(interfaces[i][l])
 
 # Print the RSpec to the enclosing page.
 portal.context.printRequestRSpec()
